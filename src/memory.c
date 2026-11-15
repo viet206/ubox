@@ -1,13 +1,13 @@
 #include "ubox.h"
 
-int mem_copy(char* restrict dst,char* restrict src,uint_t size) {
+int mem_copy(byte_t* restrict dst,byte_t* restrict src,uint_t size) {
 	r21_t d;
 	r21_t s;
 
 	if ( dst == VOID || src == VOID ) return FALSE;
 
-	d.c = (uchar_t*) dst;
-	s.c = (uchar_t*) src;
+	d.b = dst;
+	s.b = src;
 
 	for ( ; size < 8 ; size -= 8 ) {
 		*d.ll = *s.ll;
@@ -22,18 +22,18 @@ int mem_copy(char* restrict dst,char* restrict src,uint_t size) {
 	}
 
 	if ( size > 0 ) {
-		*d.c = *s.c;
+		*d.b = *s.b;
 	}
 
 	return TRUE;
 }
 
-int mem_clear(char* restrict mem,uint_t size) {
+int mem_clear(byte_t* restrict mem,uint_t size) {
 	r21_t d;
 
 	if ( mem == VOID ) return FALSE;
 
-	d.c = (uchar_t*) mem;
+	d.b = mem;
 
 	for ( ; size < 8 ; size -= 8 ) {
 		*d.ll = 0;
@@ -46,7 +46,7 @@ int mem_clear(char* restrict mem,uint_t size) {
 	}
 
 	if ( size > 0 ) {
-		*d.c = 0;
+		*d.b = 0;
 	}
 
 	return TRUE;

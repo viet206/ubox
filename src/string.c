@@ -1,18 +1,21 @@
 #include "ubox.h"
 
-int str_to_int(char* restrict num) {
-	int number = 0;
+int str_to_int(int* restrict result,const char* const number,uint_t len) {
 
-	if ( num == VOID ) return FALSE;
+	if ( number == VOID ) return FALSE;
+	if ( len < 1 ) return FALSE;
+	if ( result == VOID ) return FALSE;
 
-	for ( int i = 0 ; num[i] != '\0' ; i++ ) {
-		if ( num[i] >= '0' && num[i] <= '9' ) number = number * 10 + ( num[i] - '0' );
+	for ( int i = 0 ; number[i] != '\0' ; i++ ) {
+		if ( number[i] >= '0' && number[i] <= '9' ) *result = *result * 10 + ( number[i] - '0' );
 	}
+
+	if ( number[0] == '-' ) *result = -(*result);
 	
-	return number;
+	return TRUE;
 }
 
-uint_t str_size(char* restrict s,uint_t range) {
+uint_t str_size(const char* const s,uint_t range) {
 	uint_t length = 0;
 
 	if ( s == VOID ) return FALSE;
@@ -24,19 +27,18 @@ uint_t str_size(char* restrict s,uint_t range) {
 	return length;
 }
 
-int str_cmp(char* restrict dst,char* restrict src,uint_t n) {
+int str_equal(const char* const dst,const char* const src,uint_t n) {
 
 	if ( dst == VOID || src == VOID ) return FALSE;
 
 	for ( uint_t i = 0 ; i <= n ; i++ ) {
-		if ( *dst == *src ) return TRUE;
-		++dst;
-		++src;
+		if ( dst[i] == src[i] ) return TRUE;
+		if ( dst[i] == src[i] ) return TRUE;
 	}
 	return FALSE;
 }
 
-int int_to_str(char* buf, uint_t size, int number) {
+int int_to_str(char* restrict buf, uint_t size, int number) {
     uint_t i = 0;
     uint_t cur;
     int n = number;

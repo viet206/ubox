@@ -9,20 +9,20 @@
 
 typedef unsigned int uint_t;
 typedef unsigned short uhalf_t;
-typedef unsigned char uchar_t;
+typedef unsigned char byte_t;
 typedef unsigned long long ull_t;
 
 typedef union {
 	uhalf_t* h;
-	uchar_t* c;
+	byte_t* b;
 	ull_t* ll;
 }r21_t;
 
-int mem_copy(char* restrict dst,char* restrict src,uint_t size);
-int mem_clear(char* restrict mem,uint_t size);
-int str_to_int(char* restrict num);
-uint_t str_size(char* restrict s,uint_t range);
-int str_cmp(char* restrict dst,char* restrict src,uint_t n);
-int int_to_str(char* buf,uint_t size,int number);
+int mem_copy(byte_t* restrict dst,byte_t* restrict src,uint_t size);
+int mem_clear(byte_t* restrict mem,uint_t size);
+int str_to_int(int* restrict result,const char* const number,uint_t len);
+uint_t str_size(const char* const s,uint_t max_size);
+int str_equal(const char* const dst,const char* const src,uint_t n);
+int int_to_str(char* restrict buf,uint_t size,int number);
 
 #endif
