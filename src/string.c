@@ -15,16 +15,18 @@ int str_to_int(int* restrict result,const char* const number,uint_t len) {
 	return TRUE;
 }
 
-uint_t str_size(const char* const s,uint_t range) {
-	uint_t length = 0;
+int str_size(uint_t* restrict result,const char* const s,uint_t range) {
+    uint_t len = 0;
 
-	if ( s == VOID ) return FALSE;
+	if ( s == VOID || result == VOID ) return FALSE;
 
-	for ( ; length <= range ; length++ ) {
-		if ( s[length] == '\0' ) break;
+	for ( ; len <= range ; len++ ) {
+		if ( s[len] == '\0' ) break;
 	}
 
-	return length;
+	*result = len;
+
+	return TRUE;
 }
 
 int str_equal(const char* const dst,const char* const src,uint_t n) {
@@ -32,10 +34,10 @@ int str_equal(const char* const dst,const char* const src,uint_t n) {
 	if ( dst == VOID || src == VOID ) return FALSE;
 
 	for ( uint_t i = 0 ; i <= n ; i++ ) {
-		if ( dst[i] == src[i] ) return TRUE;
-		if ( dst[i] == src[i] ) return TRUE;
-	}
-	return FALSE;
+		if ( dst[i] != src[i] ) return FALSE;
+    }
+
+    return TRUE;
 }
 
 int int_to_str(char* restrict buf, uint_t size, int number) {
@@ -98,4 +100,12 @@ int int_to_str(char* restrict buf, uint_t size, int number) {
     buf[i] = '\0';
 
     return TRUE;
+}
+
+char* msg_to_str(int errcode) {
+    switch (errcode) {
+        case TRUE: return "true";
+        case FALSE: return "false";
+        default: return "unknown";
+    }
 }

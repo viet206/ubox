@@ -51,3 +51,51 @@ int mem_clear(byte_t* restrict mem,uint_t size) {
 
 	return TRUE;
 }
+
+int pool_new(uint_t** restrict addr,uint_t* restrict pool,uint_t chunk) {
+
+	if ( pool == VOID ) return FALSE;
+
+	uint_t cur = POOL_READ_CUR(pool[0]);
+	uint_t limit = POOL_READ_LIMIT(pool[0]);
+
+	if ( cur + chunk > limit ) return FALSE;
+
+	cur += chunk;
+
+	pool[0] =
+	POOL_WRITE_CUR(cur);
+
+	*addr = &pool[cur - chunk];
+
+	return TRUE;
+}
+
+int pool_free(uint_t* restrict pool,int mode) {
+
+	if ( pool == VOID ) return FALSE;
+
+	int cur = POOL_READ_CUR(pool[0]);
+
+	if ( cur <= 0 ) return FALSE;
+
+	switch (mode) {
+
+		case 1: // free 1 chunk
+			--cur;
+
+			pool[0] = POOL_WRITE_CUR(cur);
+
+			return TRUE;
+
+		case 2: // free all
+
+			pool[0] = POOL_WRITE_CUR(0);
+
+			return TRUE;
+
+		default:
+
+			return FALSE;
+	}
+}
