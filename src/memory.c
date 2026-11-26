@@ -1,8 +1,9 @@
 #include "ubox.h"
 
 int mem_copy(byte_t* restrict dst,byte_t* restrict src,uint_t size) {
-	r21_t d;
-	r21_t s;
+
+	ptr_t d;
+	ptr_t s;
 
 	if ( dst == VOID || src == VOID ) return FALSE;
 
@@ -29,7 +30,8 @@ int mem_copy(byte_t* restrict dst,byte_t* restrict src,uint_t size) {
 }
 
 int mem_clear(byte_t* restrict mem,uint_t size) {
-	r21_t d;
+
+	ptr_t d;
 
 	if ( mem == VOID ) return FALSE;
 
@@ -52,50 +54,37 @@ int mem_clear(byte_t* restrict mem,uint_t size) {
 	return TRUE;
 }
 
-int pool_new(uint_t** restrict addr,uint_t* restrict pool,uint_t chunk) {
+int lmm_alloc(ptr_t* restrict addr,ptr_t* restrict pool,uint_t size) {
 
-	if ( pool == VOID ) return FALSE;
+	if ( addr == VOID || pool == VOID ) return FALSE;
 
-	uint_t cur = POOL_READ_CUR(pool[0]);
-	uint_t limit = POOL_READ_LIMIT(pool[0]);
+	uint_t limit = pool->u[0];
+	uint_t cur = pool->u[1];
 
-	if ( cur + chunk > limit ) return FALSE;
+	if ( cur + size > limit ) return FALSE;
 
-	cur += chunk;
-
-	pool[0] =
-	POOL_WRITE_CUR(cur);
-
-	*addr = &pool[cur - chunk];
+	pool->u[cur] = size;
+	addr =  &pool[cur + 1];
 
 	return TRUE;
 }
 
-int pool_free(uint_t* restrict pool,int mode) {
+int pool_free(uint_t* restrict pool,int mode_clean) {
 
 	if ( pool == VOID ) return FALSE;
+	if ( pool[1] <= 0 ) return FALSE;
 
-	int cur = POOL_READ_CUR(pool[0]);
+	int cur = pool[1];
+	int size = pool[cur - 1];
 
-	if ( cur <= 0 ) return FALSE;
-
-	switch (mode) {
-
-		case 1: // free 1 chunk
-			--cur;
-
-			pool[0] = POOL_WRITE_CUR(cur);
-
+	switch (mode_clean) {
+		case LINEAR_FREE:
+			cur -= size + 1;
 			return TRUE;
-
-		case 2: // free all
-
-			pool[0] = POOL_WRITE_CUR(0);
-
+		case LINEAR_CLEAN:
+			cur -= size + 1;
 			return TRUE;
-
 		default:
-
 			return FALSE;
 	}
 }

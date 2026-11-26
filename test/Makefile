@@ -1,22 +1,51 @@
-CC = gcc
-LD = ld
-CFLAGS = -ffreestanding -nostdlib -nostdinc -nostartfiles -Wall -Wextra -I../src -O3 -pedantic -std=c99 -s
 
-SRC = ../src/memory.c ../src/string.c
-OBJ = $(notdir $(SRC:.c=.o))
+CC      ?= gcc
+AR      ?= ar
+CFLAGS  ?= -Wall -Wextra -O2 -std=c11
 
-.PHONY: all clean
+PREFIX    ?= /usr/local
+LIBDIR    ?= $(PREFIX)/lib
+INCLUDEDIR ?= $(PREFIX)/include
 
-all: ubox.o
+NAME    := ubox
+LIB     := lib$(NAME).a
 
-%.o:
-	$(CC) $(CFLAGS) -c ../src/$*.c -o $@
+SRC     := ../src/memory.c ../src/string.c
+OBJ     := $(SRC:../src/%.c=build/%.o)
+HEADER  := ../src/ubox.h
 
-ubox.o: $(OBJ)
-	$(LD) -r -o $@ $^
-	cp ../src/ubox.h .
-	rm -f $(OBJ)
+TEST    := test.c
+TESTBIN := build/test
+
+.PHONY: all clean install uninstall test
+
+all: $(LIB)
+
+build:
+	mkdir -p build
+
+build/%.o: ../src/%.c $(HEADER) | build
+	$(CC) $(CFLAGS) -I../src -c $< -o $@
+
+$(LIB): $(OBJ)
+	$(AR) rcs $@ $^
+
+$(TESTBIN): $(TEST) $(LIB) $(HEADER) | build
+	$(CC) $(CFLAGS) -I../src $(TEST) $(LIB) -o $@
+
+test: $(TESTBIN)
+	./$(TESTBIN)
+
+install: $(LIB)
+	install -d $(DESTDIR)$(LIBDIR)
+	install -d $(DESTDIR)$(INCLUDEDIR)
+	install -m 644 $(LIB) $(DESTDIR)$(LIBDIR)/$(LIB)
+	install -m 644 $(HEADER) $(DESTDIR)$(INCLUDEDIR)/$(NAME).h
+
+uninstall:
+	rm -f $(DESTDIR)$(LIBDIR)/$(LIB)
+	rm -f $(DESTDIR)$(INCLUDEDIR)/$(NAME).h
 
 clean:
-	rm -f ubox.o
-	rm -f ubox.h
+	rm -rf build $(LIB)
+

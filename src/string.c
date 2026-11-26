@@ -15,7 +15,7 @@ int str_to_int(int* restrict result,const char* const number,uint_t len) {
 	return TRUE;
 }
 
-int str_size(uint_t* restrict result,const char* const s,uint_t range) {
+int str_length(uint_t* restrict result,const char* const s,uint_t range) {
     uint_t len = 0;
 
 	if ( s == VOID || result == VOID ) return FALSE;
@@ -102,7 +102,7 @@ int int_to_str(char* restrict buf, uint_t size, int number) {
     return TRUE;
 }
 
-char* msg_to_str(int errcode) {
+const char* msg_to_str(int errcode) {
     switch (errcode) {
         case TRUE: return "true";
         case FALSE: return "false";
